@@ -19,26 +19,28 @@ frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 frame.BackgroundTransparency = 0.3
 frame.Parent = gui
 
--- Create a TextBox to input Lua code
+-- Create a TextBox to input Lua code (smaller and styled)
 local codeInput = Instance.new("TextBox")
 codeInput.Name = "CodeInput"
-codeInput.Size = UDim2.new(1, 0, 0, 150)
-codeInput.Position = UDim2.new(0, 0, 0, 0)
+codeInput.Size = UDim2.new(1, -20, 0, 100) -- smaller height
+codeInput.Position = UDim2.new(0, 10, 0, 10) -- with padding
 codeInput.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 codeInput.TextColor3 = Color3.fromRGB(0, 0, 0)
 codeInput.Font = Enum.Font.SourceSans
-codeInput.TextSize = 18
+codeInput.TextSize = 16
 codeInput.Text = "-- Enter your Lua code here"
 codeInput.TextWrapped = true
+codeInput.TextXAlignment = Enum.TextXAlignment.Left
+codeInput.TextYAlignment = Enum.TextYAlignment.Top
 codeInput.Parent = frame
 
--- Create a Button to execute the Lua code
+-- Create a Button to execute the Lua code (new color)
 local executeButton = Instance.new("TextButton")
 executeButton.Name = "ExecuteButton"
 executeButton.Size = UDim2.new(1, 0, 0, 50)
-executeButton.Position = UDim2.new(0, 0, 0, 150)
-executeButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-executeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+executeButton.Position = UDim2.new(0, 0, 0, 120)
+executeButton.BackgroundColor3 = Color3.fromRGB(0, 0, 255)  -- changed to blue
+executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 executeButton.Font = Enum.Font.SourceSans
 executeButton.TextSize = 18
 executeButton.Text = "Execute Code"
@@ -62,3 +64,31 @@ executeButton.MouseButton1Click:Connect(function()
     local code = codeInput.Text
     executeLuaCode(code)
 end)
+
+-- DRAG FUNCTIONALITY:
+
+local dragging = false
+local dragInput, startPos, startPosFrame
+
+-- Function to make the frame draggable
+frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        startPos = input.Position
+        startPosFrame = frame.Position
+    end
+end)
+
+frame.InputChanged:Connect(function(input)
+    if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - startPos
+        frame.Position = UDim2.new(startPosFrame.X.Scale, startPosFrame.X.Offset + delta.X, startPosFrame.Y.Scale, startPosFrame.Y.Offset + delta.Y)
+    end
+end)
+
+frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
